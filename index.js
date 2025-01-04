@@ -17,7 +17,7 @@ const server = http.createServer(app);
 const corsOptions = {
   origin: (origin, callback) => {
     // Allow requests from localhost (dev) and the mobile device's IP
-    const allowedOrigins = ['http://localhost:5173', 'http://172.20.10.8:5173'];
+    const allowedOrigins = ['http://localhost:5173', 'http://172.20.10.8:5173', "https://we-colab-frontend.vercel.app"];
     if (allowedOrigins.includes(origin) || !origin) {
       callback(null, true);
     } else {
@@ -35,7 +35,7 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/whiteboard', whiteboardRoutes);
 
-app.get("/", (req, res) => res.send("Express on Vercel"));
+app.get("/", (req, res) => res.send("App running on Render"));
 setupSocket(server);
 
 const PORT = process.env.PORT || 3000;
