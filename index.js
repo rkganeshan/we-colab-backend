@@ -9,7 +9,7 @@ const sequelize = require('./config/database');
 const User = require('./models/user');
 const WhiteboardSession = require('./models/whiteboardSession');
 const UserSession = require('./models/userSession');
-
+require('dotenv').config()
 const app = express();
 const server = http.createServer(app);
 
@@ -37,7 +37,7 @@ app.use('/api/whiteboard', whiteboardRoutes);
 
 setupSocket(server);
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 
 sequelize.sync().then(() => {
   server.listen(PORT, () => {
