@@ -35,6 +35,7 @@ app.use(bodyParser.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/whiteboard', whiteboardRoutes);
 
+app.get("/", (req, res) => res.send("Express on Vercel"));
 setupSocket(server);
 
 const PORT = process.env.PORT || 3000;
