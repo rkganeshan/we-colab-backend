@@ -23,19 +23,37 @@ const saveSession = async (req, res) => {
   }
 };
 
+// Function to create a new session/room and map the user to the session
+const createSession = async (roomId, userId) => {
+  const newSession = new WhiteboardSession({ roomId, drawData: [] });
+  await newSession.save();
 
+  await UserSession.findOrCreate({ where: { user_id: userId, session_id: newSession.id } });
+
+  return newSession;
+};
+
+// Load a specific session/room
 const loadSession = async (req, res) => {
   const { roomId } = req.params;
+  const { mode } = req.query;
+  const userId = req.user.id;
 
   try {
-    const session = await WhiteboardSession.findOne({ where: { roomId } });
-    if (session) {
-      res.status(200).json({ success: true, drawData: session.drawData });
-    } else {
-      res.status(404).json({ success: false, message: 'Session not found' });
+    let session = await WhiteboardSession.findOne({ where: { roomId } });
+
+    if (!session) {
+      if (mode === 'join') {
+        return res.status(404).json({ success: false, message: 'Session not found' });
+      }
+      session = await createSession(roomId, userId);
+      return res.status(200).json({ success: true, drawData: session.drawData });
     }
+
+    res.status(200).json({ success: true, drawData: session.drawData });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Error loading session:', error);
+    res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
 
@@ -43,7 +61,12 @@ const getUserSessions = async (req, res) => {
   const userId = req.user.id;
 
   try {
-    const sessions = await WhiteboardSession.findAll({ where: { userId } });
+    const sessions = await WhiteboardSession.findAll({
+      include: {
+        model: User,
+        where: { id: userId },
+      },
+    });
     res.status(200).json({ success: true, sessions });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
