@@ -37,7 +37,7 @@ app.use('/api/whiteboard', whiteboardRoutes);
 
 setupSocket(server);
 
-const PORT = process.env.PORT;
+const PORT = process.env.PORT || 3000;
 
 sequelize.sync().then(() => {
   server.listen(PORT, () => {
